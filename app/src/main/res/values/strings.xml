@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Profits</string>
+
+    <string name="register">Register</string>
+    <string name="products">Products</string>
+    <string name="profits">Profits</string>
+
+</resources>
