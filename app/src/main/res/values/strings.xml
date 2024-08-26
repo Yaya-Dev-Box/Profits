@@ -4,5 +4,17 @@
     <string name="register">Register</string>
     <string name="products">Products</string>
     <string name="profits">Profits</string>
+    <string name="plus_button">+</string>
+    <string name="name">Name</string>
+    <string name="buy_price">Buying price</string>
+    <string name="sell_price">Selling price</string>
+    <string name="save">Save</string>
+    <string name="loading">Loading</string>
+    <string name="add_product">Add product</string>
+    <string name="back">Back</string>
+    <string name="dzd">DZD</string>
+    <string name="failed_to_save_product">Failed to save product</string>
+    <string name="product_saved_successfully">Product saved successfully</string>
+    <string name="fill_all_fields">Please fill all the fields</string>
 
 </resources>

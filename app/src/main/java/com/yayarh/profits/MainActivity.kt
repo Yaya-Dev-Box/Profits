@@ -3,7 +3,6 @@ package com.yayarh.profits
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -59,6 +58,9 @@ class MainActivity : ComponentActivity() {
 fun BottomBar(navController: NavController) {
     val destinationsNavigator = navController.rememberDestinationsNavigator()
     val currentDestination: DestinationSpec = navController.currentDestinationAsState().value ?: NavGraphs.root.startDestination
+
+    /** Hide the BottomBar if the current destination isn't a [BottomBarDestination] */
+    if (currentDestination !in BottomBarDestination.entries.map { it.direction }) return
 
     NavigationBar {
         BottomBarDestination.entries.forEach { destination ->

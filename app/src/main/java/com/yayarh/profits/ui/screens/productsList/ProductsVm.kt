@@ -1,4 +1,4 @@
-package com.yayarh.profits.ui.screens.products
+package com.yayarh.profits.ui.screens.productsList
 
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
