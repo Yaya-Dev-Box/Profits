@@ -1,13 +1,12 @@
 package com.yayarh.profits.data.repos
 
-import com.yayarh.profits.data.daos.ProductsDao
 import com.yayarh.profits.data.models.ProductEntity
-import javax.inject.Inject
+import kotlinx.coroutines.flow.Flow
 
-class ProductsRepo @Inject constructor(private val productsDao: ProductsDao) {
-    fun getAllProducts() = productsDao.getAllProducts()
-    fun getProductById(id: Int) = productsDao.getProductById(id)
-    fun getProductByName(name: String) = productsDao.getProductByName(name)
-    suspend fun insertProduct(product: ProductEntity) = productsDao.insertProduct(product)
-    suspend fun deleteProductById(id: Int) = productsDao.deleteProductById(id)
+interface ProductsRepo {
+    fun getAllProducts(): Flow<List<ProductEntity>>
+    fun getProductById(id: Int): Flow<ProductEntity>
+    fun getProductByName(name: String): Flow<List<ProductEntity>>
+    suspend fun insertProduct(product: ProductEntity)
+    suspend fun deleteProductById(id: Int)
 }

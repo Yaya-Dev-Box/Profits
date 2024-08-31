@@ -11,6 +11,8 @@ sealed interface UiText {
     companion object {
         fun fromOrDefault(value: String?, @StringRes default: Int): UiText = value.nullIfBlank()?.let { StringValue(it) } ?: StringResource(default)
 
+        fun fromOrDefault(e: Exception, @StringRes default: Int): UiText = fromOrDefault(e.message, default)
+
         fun from(@StringRes res: Int): UiText = StringResource(res)
 
         fun UiText.getText(context: Context): CharSequence = when (this) {

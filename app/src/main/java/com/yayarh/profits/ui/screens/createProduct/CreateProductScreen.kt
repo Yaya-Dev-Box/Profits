@@ -41,7 +41,7 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 import com.yayarh.profits.R
 import com.yayarh.profits.data.MyDatabase
-import com.yayarh.profits.data.repos.ProductsRepo
+import com.yayarh.profits.data.repos.ProductsRepoImpl
 import com.yayarh.profits.ui.composables.TextRes
 import com.yayarh.profits.ui.screens.createProduct.CreateProductVm.CreateProductState.Failure
 import com.yayarh.profits.ui.screens.createProduct.CreateProductVm.CreateProductState.Idle
@@ -167,7 +167,7 @@ fun CreateProductsScreen(vm: CreateProductVm = hiltViewModel(), navController: D
 @Composable
 fun CreateProductScreenPreview() {
     val mockRoom = Room.inMemoryDatabaseBuilder(LocalContext.current, MyDatabase::class.java).build()
-    val mockVm = CreateProductVm(ProductsRepo(mockRoom.productsDao()))
+    val mockVm = CreateProductVm(ProductsRepoImpl(mockRoom.productsDao()))
 
     ProfitsTheme {
         CreateProductsScreen(vm = mockVm, navController = EmptyDestinationsNavigator)

@@ -6,7 +6,9 @@ import androidx.activity.compose.setContent
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -22,6 +24,7 @@ import com.ramcosta.composedestinations.DestinationsNavHost
 import com.ramcosta.composedestinations.generated.NavGraphs
 import com.ramcosta.composedestinations.generated.destinations.ProductsScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.RegisterScreenDestination
+import com.ramcosta.composedestinations.generated.destinations.ReportsScreenDestination
 import com.ramcosta.composedestinations.spec.DestinationSpec
 import com.ramcosta.composedestinations.spec.DirectionDestinationSpec
 import com.ramcosta.composedestinations.utils.currentDestinationAsState
@@ -85,5 +88,6 @@ fun BottomBar(navController: NavController) {
 
 enum class BottomBarDestination(val direction: DirectionDestinationSpec, val icon: ImageVector, @StringRes val label: Int) {
     Register(RegisterScreenDestination, Icons.Default.Home, R.string.register),
-    Articles(ProductsScreenDestination, Icons.Default.Home, R.string.products),
+    Articles(ProductsScreenDestination, Icons.AutoMirrored.Filled.List, R.string.products),
+    Reports(ReportsScreenDestination, Icons.Default.Star, R.string.reports),
 }
