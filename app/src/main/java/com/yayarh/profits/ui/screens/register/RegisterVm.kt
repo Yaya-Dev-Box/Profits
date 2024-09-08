@@ -1,6 +1,5 @@
 package com.yayarh.profits.ui.screens.register
 
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -16,7 +15,7 @@ import com.yayarh.profits.data.repos.RegisterRepo
 import com.yayarh.profits.ui.utils.UiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import javax.inject.Inject
@@ -31,13 +30,14 @@ class RegisterVm @Inject constructor(
     private val _state = mutableStateOf<RegisterState>(RegisterState.Idle)
     val state: State<RegisterState> = _state
 
-    private val _productsList: MutableState<List<ProductEntity>> = mutableStateOf(emptyList())
-    val productsList: State<List<ProductEntity>> = _productsList
+    private val _productsList: MutableStateFlow<List<ProductEntity>> = MutableStateFlow(emptyList())
+    val productsList = _productsList.asStateFlow()
 
     private val _registerItems: MutableStateFlow<List<RegisterEntity>> = MutableStateFlow(emptyList())
-    val registerItems: StateFlow<List<RegisterEntity>> = _registerItems
+    val registerItems = _registerItems.asStateFlow()
 
-    var selectedDate: MutableState<LocalDate> = mutableStateOf(LocalDate.now())
+    private val _selectedDate: MutableStateFlow<LocalDate> = MutableStateFlow(LocalDate.now())
+    val selectedDate = _selectedDate.asStateFlow()
 
     init {
         listenToProductsList()
@@ -87,7 +87,7 @@ class RegisterVm @Inject constructor(
 
                 salesRepo.insertDailySalesItem(saleEntity)
                 registerRepo.clearRegister()
-                selectedDate.value = selectedDate.value.plusDays(1)
+                incrementDate()
 
                 _state.value = RegisterState.SalesSavedSuccessfully
             } catch (e: Exception) {
@@ -110,7 +110,15 @@ class RegisterVm @Inject constructor(
             item?.getProfit().zeroIfNull() * it.amount
         }
 
-        return DailySalesEntity(0, selectedDate.value, saleSummary, totalSales, totalProfits)
+        return DailySalesEntity(0, _selectedDate.value, saleSummary, totalSales, totalProfits)
+    }
+
+    fun incrementDate() {
+        _selectedDate.value = _selectedDate.value.plusDays(1)
+    }
+
+    fun decrementDate() {
+        _selectedDate.value = _selectedDate.value.minusDays(1)
     }
 
     fun setIdleState() {

@@ -1,29 +1,31 @@
 package com.yayarh.profits.ui.screens.register
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CutCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.outlined.Add
-import androidx.compose.material3.BasicAlertDialog
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
-import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -31,6 +33,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -51,13 +54,17 @@ import com.yayarh.profits.ui.screens.register.RegisterVm.RegisterState.Loading
 import com.yayarh.profits.ui.screens.register.RegisterVm.RegisterState.SalesSavedSuccessfully
 import com.yayarh.profits.ui.theme.ProfitsTheme
 import com.yayarh.profits.ui.utils.ShowToast
+import com.yayarh.profits.ui.utils.greenOrRed
 import java.time.LocalDate
-import java.util.Date
 
 @Destination<RootGraph>(start = true)
 @Composable
 fun RegisterScreen(vm: RegisterVm = hiltViewModel(), navController: DestinationsNavigator) {
     var showSaveConfirmDialog by remember { mutableStateOf(false) }
+    val registerItems by vm.registerItems.collectAsState()
+    val productsList by vm.productsList.collectAsState()
+    val selectedDate by vm.selectedDate.collectAsState()
+
 
     when (val state = vm.state.value) {
         is Loading, is Idle -> Unit
@@ -70,27 +77,57 @@ fun RegisterScreen(vm: RegisterVm = hiltViewModel(), navController: Destinations
             .fillMaxSize()
             .background(Color.White),
         topBar = {
-            Box(Modifier.fillMaxWidth()) {
-                // TODO: Make date changeable
-                Text(text = Date().toString(), modifier = Modifier.align(Alignment.Center))
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp), shape = CutCornerShape(25.dp), elevation = CardDefaults.cardElevation(4.dp)
+            ) {
+                Box(
+                    Modifier
+                        .background(Color.White)
+                        .fillMaxWidth()
+                        .clickable { }
+                ) {
+                    Icon(
+                        Icons.AutoMirrored.Filled.KeyboardArrowLeft,
+                        contentDescription = stringResource(R.string.previous_day),
+                        modifier = Modifier
+                            .align(Alignment.CenterStart)
+                            .clickable { vm.decrementDate() }
+                    )
+                    Text(
+                        text = selectedDate.toString("dd-MM-yyyy"),
+                        modifier = Modifier.align(Alignment.Center),
+                        color = greenOrRed(selectedDate)
+                    )
+                    Icon(
+                        Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                        contentDescription = stringResource(R.string.next_day),
+                        modifier = Modifier
+                            .align(Alignment.CenterEnd)
+                            .clickable { vm.incrementDate() }
+                    )
+                }
             }
         }, bottomBar = {
             Column(Modifier.padding(horizontal = 16.dp)) {
                 LazyColumn {
-                    items(vm.registerItems.value) { item ->
+                    items(registerItems) { item ->
                         Box(Modifier.fillMaxWidth()) {
                             Text(text = item.name, modifier = Modifier.align(Alignment.CenterStart))
                             Text(text = "x" + item.amount, modifier = Modifier.align(Alignment.CenterEnd))
                         }
                     }
                 }
-                Button(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 8.dp),
-                    onClick = { showSaveConfirmDialog = vm.registerItems.value.isNotEmpty() },
-                    content = { TextRes(R.string.end_of_day) }
-                )
+                if (registerItems.isNotEmpty()) {
+                    Button(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 8.dp),
+                        onClick = { showSaveConfirmDialog = registerItems.isNotEmpty() },
+                        content = { TextRes(R.string.end_of_day) }
+                    )
+                }
             }
         }, content = { paddings ->
             LazyColumn(
@@ -98,7 +135,7 @@ fun RegisterScreen(vm: RegisterVm = hiltViewModel(), navController: Destinations
                     .padding(paddings)
                     .padding(top = 16.dp)
             ) {
-                items(vm.productsList.value) { product ->
+                items(productsList) { product ->
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -116,7 +153,6 @@ fun RegisterScreen(vm: RegisterVm = hiltViewModel(), navController: Destinations
                                     Text(text = product.name)
                                     Text(text = product.sellPrice.toString())
                                 }
-                                // TODO: Glow the date when it's not today?
                                 // TODO: Long click to add many or remove many...
                                 Column(
                                     modifier = Modifier
@@ -126,12 +162,11 @@ fun RegisterScreen(vm: RegisterVm = hiltViewModel(), navController: Destinations
                                 ) {
                                     IconButton(
                                         onClick = { vm.addToRegister(product) },
-                                        content = { Icon(Icons.Outlined.Add, stringResource(R.string.add)) }
+                                        content = { Icon(painterResource(R.drawable.add), stringResource(R.string.add)) }
                                     )
-                                    // TODO: Subtract icon...
                                     IconButton(
                                         onClick = { vm.removeFromRegister(product) },
-                                        content = { Icon(Icons.Filled.Delete, stringResource(R.string.delete)) }
+                                        content = { Icon(painterResource(R.drawable.remove), stringResource(R.string.delete)) }
                                     )
                                 }
                             }
@@ -141,8 +176,8 @@ fun RegisterScreen(vm: RegisterVm = hiltViewModel(), navController: Destinations
 
             if (showSaveConfirmDialog) {
                 EndOfDayDialog(
-                    date = vm.selectedDate.value,
-                    onSave = { vm.saveTodaySales() },
+                    date = selectedDate,
+                    onSave = { vm.saveTodaySales(); showSaveConfirmDialog = false },
                     onDismiss = { showSaveConfirmDialog = false }
                 )
             }
@@ -152,34 +187,32 @@ fun RegisterScreen(vm: RegisterVm = hiltViewModel(), navController: Destinations
 
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EndOfDayDialog(date: LocalDate, onSave: () -> Unit, onDismiss: () -> Unit) {
-    BasicAlertDialog(onDismiss) {
-        Card {
-            Column(
-                Modifier
-                    .background(Color.White)
-                    .padding(8.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                content = {
-                    TextRes(R.string.save_today_sales)
-                    Text(date.toString("dd-MM-yyyy"), color = if (date == LocalDate.now()) Color.Green else Color.Red)
-                    Spacer(Modifier.height(16.dp))
-
-                    Button(
-                        onClick = {
-                            onSave()
-                            onDismiss()
-                        },
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text(stringResource(id = R.string.save))
-                    }
-                }
+    AlertDialog(
+        onDismissRequest = { onDismiss() },
+        title = { TextRes(R.string.end_of_day) },
+        text = {
+            Column {
+                TextRes(R.string.save_today_sales)
+                Text(date.toString("dd-MM-yyyy"), color = greenOrRed(date))
+            }
+        },
+        confirmButton = {
+            Button(
+                modifier = Modifier.padding(8.dp),
+                onClick = { onSave() },
+                content = { TextRes(R.string.save) }
+            )
+        },
+        dismissButton = {
+            Button(
+                modifier = Modifier.padding(8.dp),
+                onClick = { onDismiss() },
+                content = { TextRes(R.string.cancel) }
             )
         }
-    }
+    )
 }
 
 @Preview

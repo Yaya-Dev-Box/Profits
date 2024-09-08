@@ -49,8 +49,6 @@ class CreateProductVm @Inject constructor(private val productsRepo: ProductsRepo
         }
     }
 
-    // TODO: Negative sell and buy...
-
     private fun validateAndGenerateProductItem(): ProductEntity? {
         val name = name.trim()
         val buyPrice = buyingPrice.toIntOrNull()

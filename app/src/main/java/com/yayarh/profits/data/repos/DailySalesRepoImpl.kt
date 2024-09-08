@@ -8,7 +8,7 @@ import javax.inject.Inject
 
 class DailySalesRepoImpl @Inject constructor(private val salesDao: DailySalesDao) : DailySalesRepo {
 
-    override fun getDailySalesItems(startDate: LocalDate, endDate: LocalDate): Flow<List<DailySalesEntity>> {
+    override suspend fun getDailySalesItems(startDate: LocalDate, endDate: LocalDate): Flow<List<DailySalesEntity>> {
         return salesDao.getDailySalesItems(startDate, endDate)
     }
 

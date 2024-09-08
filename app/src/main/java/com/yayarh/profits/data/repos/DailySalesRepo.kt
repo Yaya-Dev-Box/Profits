@@ -6,7 +6,7 @@ import java.time.LocalDate
 
 interface DailySalesRepo {
 
-    fun getDailySalesItems(startDate: LocalDate, endDate: LocalDate): Flow<List<DailySalesEntity>>
+    suspend fun getDailySalesItems(startDate: LocalDate, endDate: LocalDate): Flow<List<DailySalesEntity>>
 
     suspend fun insertDailySalesItem(dailySales: DailySalesEntity)
 
