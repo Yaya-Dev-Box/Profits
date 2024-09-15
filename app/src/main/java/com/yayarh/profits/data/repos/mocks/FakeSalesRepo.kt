@@ -1,7 +1,7 @@
 package com.yayarh.profits.data.repos.mocks
 
 import com.yayarh.profits.data.models.DailySalesEntity
-import com.yayarh.profits.data.repos.DailySalesRepo
+import com.yayarh.profits.data.repos.base.DailySalesRepo
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import java.time.LocalDate

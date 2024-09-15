@@ -7,7 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.yayarh.profits.R
 import com.yayarh.profits.data.models.ProductEntity
-import com.yayarh.profits.data.repos.ProductsRepo
+import com.yayarh.profits.data.repos.base.ProductsRepo
 import com.yayarh.profits.ui.screens.createProduct.CreateProductVm.CreateProductState.Failure
 import com.yayarh.profits.ui.screens.createProduct.CreateProductVm.CreateProductState.Idle
 import com.yayarh.profits.ui.screens.createProduct.CreateProductVm.CreateProductState.Loading

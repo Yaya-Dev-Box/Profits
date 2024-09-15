@@ -4,12 +4,12 @@ import android.app.Application
 import androidx.room.Room
 import com.yayarh.profits.data.MyDatabase
 import com.yayarh.profits.data.daos.ProductsDao
-import com.yayarh.profits.data.repos.DailySalesRepo
-import com.yayarh.profits.data.repos.DailySalesRepoImpl
-import com.yayarh.profits.data.repos.ProductsRepo
-import com.yayarh.profits.data.repos.ProductsRepoImpl
-import com.yayarh.profits.data.repos.RegisterRepo
-import com.yayarh.profits.data.repos.RegisterRepoImpl
+import com.yayarh.profits.data.repos.base.DailySalesRepo
+import com.yayarh.profits.data.repos.imps.DailySalesRepoImpl
+import com.yayarh.profits.data.repos.base.OrdersRepo
+import com.yayarh.profits.data.repos.imps.OrdersRepoImpl
+import com.yayarh.profits.data.repos.base.ProductsRepo
+import com.yayarh.profits.data.repos.imps.ProductsRepoImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -34,17 +34,17 @@ object RoomModule {
 
     @Singleton
     @Provides
-    fun provideRegisterDao(db: MyDatabase) = db.registerDao()
-
-    @Singleton
-    @Provides
-    fun provideRegisterRepo(db: MyDatabase): RegisterRepo = RegisterRepoImpl(db.registerDao())
-
-    @Singleton
-    @Provides
     fun provideDailySalesDao(db: MyDatabase) = db.dailySalesDao()
 
     @Singleton
     @Provides
     fun provideDailySalesRepo(db: MyDatabase): DailySalesRepo = DailySalesRepoImpl(db.dailySalesDao())
+
+    @Singleton
+    @Provides
+    fun provideOrdersDao(db: MyDatabase) = db.ordersDao()
+
+    @Singleton
+    @Provides
+    fun provideOrdersRepo(db: MyDatabase): OrdersRepo = OrdersRepoImpl(db.ordersDao())
 }

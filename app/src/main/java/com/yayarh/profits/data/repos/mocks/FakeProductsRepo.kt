@@ -1,7 +1,7 @@
 package com.yayarh.profits.data.repos.mocks
 
 import com.yayarh.profits.data.models.ProductEntity
-import com.yayarh.profits.data.repos.ProductsRepo
+import com.yayarh.profits.data.repos.base.ProductsRepo
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 

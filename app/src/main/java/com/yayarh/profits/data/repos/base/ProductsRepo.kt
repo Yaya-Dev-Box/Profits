@@ -1,4 +1,4 @@
-package com.yayarh.profits.data.repos
+package com.yayarh.profits.data.repos.base
 
 import com.yayarh.profits.data.models.ProductEntity
 import kotlinx.coroutines.flow.Flow

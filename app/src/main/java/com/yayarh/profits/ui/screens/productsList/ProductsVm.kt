@@ -6,7 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.yayarh.profits.data.models.ProductEntity
-import com.yayarh.profits.data.repos.ProductsRepo
+import com.yayarh.profits.data.repos.base.ProductsRepo
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject

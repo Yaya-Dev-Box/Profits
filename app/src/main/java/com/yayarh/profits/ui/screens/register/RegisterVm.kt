@@ -5,13 +5,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.yayarh.profits.R
-import com.yayarh.profits.common.zeroIfNull
 import com.yayarh.profits.data.models.DailySalesEntity
 import com.yayarh.profits.data.models.ProductEntity
-import com.yayarh.profits.data.models.RegisterEntity
-import com.yayarh.profits.data.repos.DailySalesRepo
-import com.yayarh.profits.data.repos.ProductsRepo
-import com.yayarh.profits.data.repos.RegisterRepo
+import com.yayarh.profits.data.repos.base.DailySalesRepo
+import com.yayarh.profits.data.repos.base.OrdersRepo
+import com.yayarh.profits.domain.models.CombinedOrderItem
+import com.yayarh.profits.domain.utils.DataMappers.toCombinedOrderItem
 import com.yayarh.profits.ui.utils.UiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,59 +21,27 @@ import javax.inject.Inject
 
 @HiltViewModel
 class RegisterVm @Inject constructor(
-    private val productsRepo: ProductsRepo,
-    private val registerRepo: RegisterRepo,
+    private val ordersRepo: OrdersRepo,
     private val salesRepo: DailySalesRepo
 ) : ViewModel() {
 
     private val _state = mutableStateOf<RegisterState>(RegisterState.Idle)
     val state: State<RegisterState> = _state
 
-    private val _productsList: MutableStateFlow<List<ProductEntity>> = MutableStateFlow(emptyList())
-    val productsList = _productsList.asStateFlow()
-
-    private val _registerItems: MutableStateFlow<List<RegisterEntity>> = MutableStateFlow(emptyList())
-    val registerItems = _registerItems.asStateFlow()
+    private val _ordersList: MutableStateFlow<List<CombinedOrderItem>> = MutableStateFlow(emptyList())
+    val ordersList = _ordersList.asStateFlow()
 
     private val _selectedDate: MutableStateFlow<LocalDate> = MutableStateFlow(LocalDate.now())
     val selectedDate = _selectedDate.asStateFlow()
 
     init {
-        listenToProductsList()
-        listenToRegisterItems()
+        listenToOrdersList()
     }
 
-    private fun listenToProductsList() {
+    private fun listenToOrdersList() {
         viewModelScope.launch {
-            productsRepo.getAllProducts().collect { _productsList.value = it }
-        }
-    }
-
-    private fun listenToRegisterItems() {
-        viewModelScope.launch {
-            registerRepo.getRegisterItems().collect { _registerItems.value = it }
-        }
-    }
-
-    fun addToRegister(product: ProductEntity) {
-        viewModelScope.launch {
-            val registerItem = RegisterEntity(product.id, product.name, 1)
-            val itemAlreadyInRegister = registerItems.value.firstOrNull { it.id == registerItem.id } != null
-
-            if (itemAlreadyInRegister) registerRepo.updateRegisterItemAmount(registerItem.id, 1)
-            else registerRepo.insertRegisterItem(registerItem)
-        }
-    }
-
-    fun removeFromRegister(product: ProductEntity) {
-        viewModelScope.launch {
-            val registerItem = RegisterEntity(product.id, product.name, 1)
-            val itemAlreadyInRegister = registerItems.value.firstOrNull { it.id == registerItem.id } != null
-
-            if (itemAlreadyInRegister) {
-                val item = registerItems.value.first { it.id == registerItem.id }
-                if (item.amount <= 1) registerRepo.deleteRegisterItem(registerItem.id)
-                else registerRepo.updateRegisterItemAmount(registerItem.id, -1)
+            ordersRepo.getAllOrders().collect {
+                _ordersList.value = it.toCombinedOrderItem()
             }
         }
     }
@@ -86,7 +53,7 @@ class RegisterVm @Inject constructor(
                 _state.value = RegisterState.Loading
 
                 salesRepo.insertDailySalesItem(saleEntity)
-                registerRepo.clearRegister()
+                ordersRepo.deleteAllOrders()
                 incrementDate()
 
                 _state.value = RegisterState.SalesSavedSuccessfully
@@ -98,17 +65,23 @@ class RegisterVm @Inject constructor(
     }
 
     private fun generateDailySaleEntity(): DailySalesEntity? {
-        if (registerItems.value.isEmpty()) return null
+        if (ordersList.value.isEmpty()) return null
 
-        val saleSummary = registerItems.value.joinToString(", ") { it.name + " x" + it.amount }
-        val totalSales = registerItems.value.sumOf {
-            val item = _productsList.value.firstOrNull { prod -> prod.id == it.id }
-            item?.buyPrice.zeroIfNull() * it.amount
+        // TODO: Unit tests for these functions...
+
+        val fullCartList = ordersList.value.map { it.products }.flatten()
+
+        val productsQuantities: Map<ProductEntity, Int> = buildMap {
+            fullCartList.forEach {
+                val quantityInMap = this.getOrDefault(it.product, 0)
+                put(it.product, quantityInMap + it.quantity)
+            }
         }
-        val totalProfits = registerItems.value.sumOf {
-            val item = _productsList.value.firstOrNull { prod -> prod.id == it.id }
-            item?.getProfit().zeroIfNull() * it.amount
-        }
+
+        val saleSummary = productsQuantities.entries.joinToString("") { "${it.key.name} x${it.value} \n" }.trim()
+
+        val totalSales = fullCartList.sumOf { it.product.buyPrice * it.quantity }
+        val totalProfits = fullCartList.sumOf { (it.product.sellPrice - it.product.buyPrice) * it.quantity }
 
         return DailySalesEntity(0, _selectedDate.value, saleSummary, totalSales, totalProfits)
     }

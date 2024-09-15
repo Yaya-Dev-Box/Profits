@@ -1,7 +1,8 @@
-package com.yayarh.profits.data.repos
+package com.yayarh.profits.data.repos.imps
 
 import com.yayarh.profits.data.daos.ProductsDao
 import com.yayarh.profits.data.models.ProductEntity
+import com.yayarh.profits.data.repos.base.ProductsRepo
 import javax.inject.Inject
 
 class ProductsRepoImpl @Inject constructor(private val productsDao: ProductsDao) : ProductsRepo {

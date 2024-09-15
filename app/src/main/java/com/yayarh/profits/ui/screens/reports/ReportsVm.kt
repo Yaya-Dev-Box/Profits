@@ -3,7 +3,7 @@ package com.yayarh.profits.ui.screens.reports
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.yayarh.profits.data.models.DailySalesEntity
-import com.yayarh.profits.data.repos.DailySalesRepo
+import com.yayarh.profits.data.repos.base.DailySalesRepo
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow

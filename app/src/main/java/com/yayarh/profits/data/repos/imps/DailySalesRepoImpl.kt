@@ -1,7 +1,8 @@
-package com.yayarh.profits.data.repos
+package com.yayarh.profits.data.repos.imps
 
 import com.yayarh.profits.data.daos.DailySalesDao
 import com.yayarh.profits.data.models.DailySalesEntity
+import com.yayarh.profits.data.repos.base.DailySalesRepo
 import kotlinx.coroutines.flow.Flow
 import java.time.LocalDate
 import javax.inject.Inject

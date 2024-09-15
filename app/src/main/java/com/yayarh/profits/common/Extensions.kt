@@ -6,8 +6,11 @@ import java.time.format.DateTimeFormatter
 
 fun String?.nullIfBlank() = if (this.isNullOrBlank()) null else this
 
+@Suppress("unused")
 fun Int?.zeroIfNull() = this ?: 0
 
 fun LocalDate.toString(format: String): String = this.format(DateTimeFormatter.ofPattern(format))
 
 fun YearMonth.toString(format: String): String = this.format(DateTimeFormatter.ofPattern(format))
+
+fun <T> List<T>.nullIfEmpty() = this.ifEmpty { null }
