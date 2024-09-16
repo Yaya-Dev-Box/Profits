@@ -11,7 +11,7 @@ interface OrdersRepo {
 
     suspend fun insertOrders(orders: List<OrderEntity>): Result<Unit>
 
-    suspend fun deleteOrder(id: Int): Result<Unit>
+    suspend fun deleteOrderByOrderId(orderId: Int): Result<Unit>
 
     suspend fun deleteAllOrders(): Result<Unit>
 }

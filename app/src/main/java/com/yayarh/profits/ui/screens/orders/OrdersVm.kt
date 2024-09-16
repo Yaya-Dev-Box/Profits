@@ -1,15 +1,14 @@
-package com.yayarh.profits.ui.screens.register
+package com.yayarh.profits.ui.screens.orders
 
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.yayarh.profits.R
-import com.yayarh.profits.data.models.DailySalesEntity
-import com.yayarh.profits.data.models.ProductEntity
 import com.yayarh.profits.data.repos.base.DailySalesRepo
 import com.yayarh.profits.data.repos.base.OrdersRepo
 import com.yayarh.profits.domain.models.CombinedOrderItem
+import com.yayarh.profits.domain.utils.DataGenerators
 import com.yayarh.profits.domain.utils.DataMappers.toCombinedOrderItem
 import com.yayarh.profits.ui.utils.UiText
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -20,7 +19,7 @@ import java.time.LocalDate
 import javax.inject.Inject
 
 @HiltViewModel
-class RegisterVm @Inject constructor(
+class OrdersVm @Inject constructor(
     private val ordersRepo: OrdersRepo,
     private val salesRepo: DailySalesRepo
 ) : ViewModel() {
@@ -49,7 +48,7 @@ class RegisterVm @Inject constructor(
     fun saveTodaySales() {
         viewModelScope.launch {
             try {
-                val saleEntity = generateDailySaleEntity() ?: return@launch
+                val saleEntity = DataGenerators.generateDailySaleEntity(ordersList.value, selectedDate.value) ?: return@launch
                 _state.value = RegisterState.Loading
 
                 salesRepo.insertDailySalesItem(saleEntity)
@@ -64,28 +63,6 @@ class RegisterVm @Inject constructor(
         }
     }
 
-    private fun generateDailySaleEntity(): DailySalesEntity? {
-        if (ordersList.value.isEmpty()) return null
-
-        // TODO: Unit tests for these functions...
-
-        val fullCartList = ordersList.value.map { it.products }.flatten()
-
-        val productsQuantities: Map<ProductEntity, Int> = buildMap {
-            fullCartList.forEach {
-                val quantityInMap = this.getOrDefault(it.product, 0)
-                put(it.product, quantityInMap + it.quantity)
-            }
-        }
-
-        val saleSummary = productsQuantities.entries.joinToString("") { "${it.key.name} x${it.value} \n" }.trim()
-
-        val totalSales = fullCartList.sumOf { it.product.buyPrice * it.quantity }
-        val totalProfits = fullCartList.sumOf { (it.product.sellPrice - it.product.buyPrice) * it.quantity }
-
-        return DailySalesEntity(0, _selectedDate.value, saleSummary, totalSales, totalProfits)
-    }
-
     fun incrementDate() {
         _selectedDate.value = _selectedDate.value.plusDays(1)
     }
@@ -96,6 +73,12 @@ class RegisterVm @Inject constructor(
 
     fun setIdleState() {
         _state.value = RegisterState.Idle
+    }
+
+    fun deleteCombinedOrderItem(combinedOrder: CombinedOrderItem) {
+        viewModelScope.launch {
+            ordersRepo.deleteOrderByOrderId(combinedOrder.id)
+        }
     }
 
     sealed interface RegisterState {

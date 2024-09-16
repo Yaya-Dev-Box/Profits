@@ -85,47 +85,55 @@ fun CreateOrderScreen(vm: CreateOrderVm = hiltViewModel(), navController: Destin
 
             }
         }, content = { paddings ->
-            LazyColumn(
+            Box(
                 Modifier
-                    .padding(paddings)
-                    .padding(top = 16.dp)
-            ) {
-                items(productsList) { product ->
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(96.dp)
-                            .padding(horizontal = 16.dp, vertical = 8.dp),
-                        content = {
-                            Row {
-                                Column(
-                                    modifier = Modifier
-                                        .padding(8.dp)
-                                        .fillParentMaxHeight()
-                                        .fillMaxWidth(0.8F),
-                                    Arrangement.Center
-                                ) {
-                                    Text(text = product.name)
-                                    Text(text = product.sellPrice.toString())
+                    .fillMaxSize()
+                    .padding(paddings)) {
+                if (productsList.isEmpty()) {
+                    TextRes(R.string.no_products, Modifier.align(Alignment.Center))
+                }
+
+                LazyColumn(
+                    Modifier
+                        .padding(top = 16.dp)
+                ) {
+                    items(productsList) { product ->
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(96.dp)
+                                .padding(horizontal = 16.dp, vertical = 8.dp),
+                            content = {
+                                Row {
+                                    Column(
+                                        modifier = Modifier
+                                            .padding(8.dp)
+                                            .fillParentMaxHeight()
+                                            .fillMaxWidth(0.8F),
+                                        Arrangement.Center
+                                    ) {
+                                        Text(text = product.name)
+                                        Text(text = product.sellPrice.toString())
+                                    }
+                                    // TODO: Long click to add many or remove many...
+                                    Column(
+                                        modifier = Modifier
+                                            .align(Alignment.CenterVertically)
+                                            .fillParentMaxWidth(0.2F),
+                                        horizontalAlignment = Alignment.CenterHorizontally
+                                    ) {
+                                        IconButton(
+                                            onClick = { vm.addToCart(product, 1) },
+                                            content = { Icon(painterResource(R.drawable.add), stringResource(R.string.add)) }
+                                        )
+                                        IconButton(
+                                            onClick = { vm.removeFromCart(product) },
+                                            content = { Icon(painterResource(R.drawable.remove), stringResource(R.string.delete)) }
+                                        )
+                                    }
                                 }
-                                // TODO: Long click to add many or remove many...
-                                Column(
-                                    modifier = Modifier
-                                        .align(Alignment.CenterVertically)
-                                        .fillParentMaxWidth(0.2F),
-                                    horizontalAlignment = Alignment.CenterHorizontally
-                                ) {
-                                    IconButton(
-                                        onClick = { vm.addToCart(product, 1) },
-                                        content = { Icon(painterResource(R.drawable.add), stringResource(R.string.add)) }
-                                    )
-                                    IconButton(
-                                        onClick = { vm.removeFromCart(product) },
-                                        content = { Icon(painterResource(R.drawable.remove), stringResource(R.string.delete)) }
-                                    )
-                                }
-                            }
-                        })
+                            })
+                    }
                 }
             }
         },

@@ -31,7 +31,7 @@ open class FakeOrdersRepo : OrdersRepo {
 
     override suspend fun insertOrders(orders: List<OrderEntity>): Result<Unit> = Result.success(Unit)
 
-    override suspend fun deleteOrder(id: Int): Result<Unit> = Result.success(Unit)
+    override suspend fun deleteOrderByOrderId(orderId: Int): Result<Unit> = Result.success(Unit)
 
     override suspend fun deleteAllOrders(): Result<Unit> = Result.success(Unit)
 

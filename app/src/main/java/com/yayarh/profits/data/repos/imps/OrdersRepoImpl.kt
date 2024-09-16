@@ -15,7 +15,7 @@ class OrdersRepoImpl @Inject constructor(private val ordersDao: OrdersDao) : Ord
 
     override suspend fun insertOrders(orders: List<OrderEntity>) = safeCall { ordersDao.insertOrders(orders) }
 
-    override suspend fun deleteOrder(id: Int) = safeCall { ordersDao.deleteOrdersByOrderId(id) }
+    override suspend fun deleteOrderByOrderId(orderId: Int) = safeCall { ordersDao.deleteOrdersByOrderId(orderId) }
 
     override suspend fun deleteAllOrders() = safeCall { ordersDao.deleteAllOrders() }
 

@@ -29,11 +29,16 @@
     <string name="next_day">Next day</string>
     <string name="no_sales">No sales</string>
     <string name="delete_report">Delete report</string>
+    <string name="delete_product">Delete product</string>
+    <string name="delete_order">Delete order</string>
     <string name="delete_this_report_q">Are you sure you want to delete this report?</string>
+    <string name="delete_this_product_q">Are you sure you want to delete this product?</string>
+    <string name="delete_this_order_q">Are you sure you want to delete this order?</string>
     <string name="cancel">Cancel</string>
     <string name="add_order">Add order</string>
     <string name="create_order">Create Order</string>
     <string name="save_order">Save Order</string>
     <string name="no_orders">No orders</string>
+    <string name="no_products">No products</string>
 
 </resources>

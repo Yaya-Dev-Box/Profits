@@ -22,8 +22,8 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.ramcosta.composedestinations.DestinationsNavHost
 import com.ramcosta.composedestinations.generated.NavGraphs
+import com.ramcosta.composedestinations.generated.destinations.OrdersScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.ProductsScreenDestination
-import com.ramcosta.composedestinations.generated.destinations.RegisterScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.ReportsScreenDestination
 import com.ramcosta.composedestinations.spec.DestinationSpec
 import com.ramcosta.composedestinations.spec.DirectionDestinationSpec
@@ -87,7 +87,7 @@ fun BottomBar(navController: NavController) {
 }
 
 enum class BottomBarDestination(val direction: DirectionDestinationSpec, val icon: ImageVector, @StringRes val label: Int) {
-    Register(RegisterScreenDestination, Icons.Default.Home, R.string.register),
+    Register(OrdersScreenDestination, Icons.Default.Home, R.string.register),
     Articles(ProductsScreenDestination, Icons.AutoMirrored.Filled.List, R.string.products),
     Reports(ReportsScreenDestination, Icons.Default.Star, R.string.reports),
 }

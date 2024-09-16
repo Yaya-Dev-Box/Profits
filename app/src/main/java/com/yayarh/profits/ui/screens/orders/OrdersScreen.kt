@@ -1,7 +1,9 @@
-package com.yayarh.profits.ui.screens.register
+package com.yayarh.profits.ui.screens.orders
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -48,20 +50,27 @@ import com.yayarh.profits.common.toString
 import com.yayarh.profits.data.models.OrderEntity
 import com.yayarh.profits.data.repos.mocks.FakeOrdersRepo
 import com.yayarh.profits.data.repos.mocks.FakeSalesRepo
+import com.yayarh.profits.domain.models.CombinedOrderItem
 import com.yayarh.profits.ui.composables.TextRes
-import com.yayarh.profits.ui.screens.register.RegisterVm.RegisterState.Failure
-import com.yayarh.profits.ui.screens.register.RegisterVm.RegisterState.Idle
-import com.yayarh.profits.ui.screens.register.RegisterVm.RegisterState.Loading
-import com.yayarh.profits.ui.screens.register.RegisterVm.RegisterState.SalesSavedSuccessfully
+import com.yayarh.profits.ui.screens.orders.OrdersVm.RegisterState.Failure
+import com.yayarh.profits.ui.screens.orders.OrdersVm.RegisterState.Idle
+import com.yayarh.profits.ui.screens.orders.OrdersVm.RegisterState.Loading
+import com.yayarh.profits.ui.screens.orders.OrdersVm.RegisterState.SalesSavedSuccessfully
+import com.yayarh.profits.ui.screens.reports.ReportDeletionDialog
 import com.yayarh.profits.ui.theme.ProfitsTheme
 import com.yayarh.profits.ui.utils.ShowToast
 import com.yayarh.profits.ui.utils.greenOrRed
 import kotlinx.coroutines.flow.flowOf
 import java.time.LocalDate
 
+@OptIn(ExperimentalFoundationApi::class)
 @Destination<RootGraph>(start = true)
 @Composable
-fun RegisterScreen(vm: RegisterVm = hiltViewModel(), navController: DestinationsNavigator) {
+fun OrdersScreen(vm: OrdersVm = hiltViewModel(), navController: DestinationsNavigator) {
+
+    /** State to hold the order to delete (used to show/hide the deletion dialog) */
+    var orderToDelete: CombinedOrderItem? by remember { mutableStateOf(null) }
+
     var showSaveConfirmDialog by remember { mutableStateOf(false) }
     val ordersList by vm.ordersList.collectAsState()
     val selectedDate by vm.selectedDate.collectAsState()
@@ -81,7 +90,9 @@ fun RegisterScreen(vm: RegisterVm = hiltViewModel(), navController: Destinations
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp), shape = CutCornerShape(25.dp), elevation = CardDefaults.cardElevation(4.dp)
+                    .padding(16.dp),
+                shape = CutCornerShape(25.dp),
+                elevation = CardDefaults.cardElevation(4.dp)
             ) {
                 Box(
                     Modifier
@@ -121,7 +132,7 @@ fun RegisterScreen(vm: RegisterVm = hiltViewModel(), navController: Destinations
                         .padding(paddings)
                         .padding(top = 16.dp)
                 ) {
-                    items(ordersList) { product ->
+                    items(ordersList) { order ->
                         Card(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -130,12 +141,13 @@ fun RegisterScreen(vm: RegisterVm = hiltViewModel(), navController: Destinations
                                 Row {
                                     Column(
                                         modifier = Modifier
+                                            .combinedClickable(onLongClick = { orderToDelete = order }, onClick = {})
                                             .padding(8.dp)
-                                            .fillMaxWidth(0.8F),
+                                            .fillMaxWidth(),
                                         Arrangement.Center
                                     ) {
-                                        Text(text = product.generateSaleSummary())
-                                        val profits = product.getProfits()
+                                        Text(text = order.generateSaleSummary())
+                                        val profits = order.getProfits()
                                         Text(text = profits.toString(), color = greenOrRed(profits))
                                     }
                                 }
@@ -144,6 +156,7 @@ fun RegisterScreen(vm: RegisterVm = hiltViewModel(), navController: Destinations
                 }
             }
 
+
             if (showSaveConfirmDialog) {
                 EndOfDayDialog(
                     date = selectedDate,
@@ -151,10 +164,20 @@ fun RegisterScreen(vm: RegisterVm = hiltViewModel(), navController: Destinations
                     onDismiss = { showSaveConfirmDialog = false }
                 )
             }
+            /** Show dialog to delete report if available */
+            orderToDelete?.let {
+                ReportDeletionDialog(
+                    onDeleteClicked = { vm.deleteCombinedOrderItem(it); orderToDelete = null },
+                    onCancelClicked = { orderToDelete = null })
+            }
 
         },
         bottomBar = {
-            Column(Modifier.padding(horizontal = 16.dp).fillMaxWidth()) {
+            Column(
+                Modifier
+                    .padding(horizontal = 16.dp)
+                    .fillMaxWidth()
+            ) {
 
                 FloatingActionButton(
                     modifier = Modifier
@@ -209,12 +232,36 @@ fun EndOfDayDialog(date: LocalDate, onSave: () -> Unit, onDismiss: () -> Unit) {
     )
 }
 
+@Composable
+fun OrderDeletionDialog(onDeleteClicked: () -> Unit, onCancelClicked: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = { onCancelClicked() },
+        title = { TextRes(R.string.delete_order) },
+        text = { TextRes(R.string.delete_this_order_q) },
+        confirmButton = {
+            Button(
+                modifier = Modifier.padding(8.dp),
+                onClick = { onDeleteClicked() },
+                content = { TextRes(R.string.delete) }
+            )
+        },
+        dismissButton = {
+            Button(
+                modifier = Modifier.padding(8.dp),
+                onClick = { onCancelClicked() },
+                content = { TextRes(R.string.cancel) }
+            )
+        }
+    )
+}
+
+
 @Preview
 @Composable
 fun RegisterScreenPreview() {
     ProfitsTheme {
-        val vm = RegisterVm(FakeOrdersRepo(), FakeSalesRepo())
-        RegisterScreen(vm = vm, EmptyDestinationsNavigator)
+        val vm = OrdersVm(FakeOrdersRepo(), FakeSalesRepo())
+        OrdersScreen(vm = vm, EmptyDestinationsNavigator)
     }
 }
 
@@ -222,10 +269,10 @@ fun RegisterScreenPreview() {
 @Composable
 fun EmptyRegisterScreenPreview() {
     ProfitsTheme {
-        val vm = RegisterVm(object : FakeOrdersRepo() {
+        val vm = OrdersVm(object : FakeOrdersRepo() {
             override suspend fun getAllOrders() = flowOf<List<OrderEntity>>(emptyList())
         }, FakeSalesRepo())
-        RegisterScreen(vm = vm, EmptyDestinationsNavigator)
+        OrdersScreen(vm = vm, EmptyDestinationsNavigator)
     }
 }
 
@@ -234,5 +281,13 @@ fun EmptyRegisterScreenPreview() {
 fun SaveDialogPreview() {
     ProfitsTheme {
         EndOfDayDialog(LocalDate.now().minusDays(1), {}, {})
+    }
+}
+
+@Preview
+@Composable
+fun OrderDeletionDialogPreview() {
+    ProfitsTheme {
+        OrderDeletionDialog({}, {})
     }
 }

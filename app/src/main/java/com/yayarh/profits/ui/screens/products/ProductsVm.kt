@@ -1,4 +1,4 @@
-package com.yayarh.profits.ui.screens.productsList
+package com.yayarh.profits.ui.screens.products
 
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
@@ -27,4 +27,9 @@ class ProductsVm @Inject constructor(private val productsRepo: ProductsRepo) : V
         }
     }
 
+    fun deleteProduct(product: ProductEntity) {
+        viewModelScope.launch {
+            productsRepo.deleteProductById(product.id)
+        }
+    }
 }
