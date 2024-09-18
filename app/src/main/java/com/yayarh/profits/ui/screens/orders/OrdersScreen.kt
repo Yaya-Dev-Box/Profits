@@ -175,7 +175,6 @@ fun OrdersScreen(vm: OrdersVm = hiltViewModel(), navController: DestinationsNavi
         bottomBar = {
             Column(
                 Modifier
-                    .padding(horizontal = 16.dp)
                     .fillMaxWidth()
             ) {
 
@@ -193,7 +192,7 @@ fun OrdersScreen(vm: OrdersVm = hiltViewModel(), navController: DestinationsNavi
                     Button(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(top = 8.dp),
+                            .padding(horizontal = 16.dp,vertical = 8.dp),
                         onClick = { showSaveConfirmDialog = ordersList.isNotEmpty() },
                         content = { TextRes(R.string.end_of_day) }
                     )

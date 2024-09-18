@@ -58,7 +58,6 @@ fun ProductsScreen(vm: ProductsVm = hiltViewModel(), navController: Destinations
     Column(
         Modifier
             .fillMaxSize()
-            .background(Color.White)
     ) {
 
         TopAppBar(
@@ -144,7 +143,9 @@ fun ProductDeletionDialog(onDeleteClicked: () -> Unit, onCancelClicked: () -> Un
 @Composable
 fun ProductsScreenPreview() {
     ProfitsTheme {
-        ProductsScreen(ProductsVm(FakeProductsRepo()), EmptyDestinationsNavigator)
+        Box(Modifier.background(Color.White)) {
+            ProductsScreen(ProductsVm(FakeProductsRepo()), EmptyDestinationsNavigator)
+        }
     }
 }
 

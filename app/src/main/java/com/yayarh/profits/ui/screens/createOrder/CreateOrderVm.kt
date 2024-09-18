@@ -46,24 +46,21 @@ class CreateOrderVm @Inject constructor(
 
     fun addToCart(product: ProductEntity, quantity: Int) {
         viewModelScope.launch {
-            val registerItem = CartItem(product, quantity)
-            val itemAlreadyInRegister = cartItems.value.firstOrNull { it.product.id == registerItem.product.id } != null
+            val itemAlreadyInRegister = cartItems.value.firstOrNull { it.product.id == product.id } != null
 
             if (itemAlreadyInRegister) {
                 _cartItems.value = _cartItems.value.map {
-                    if (it.product.id == registerItem.product.id) it.copy(quantity = it.quantity + quantity)
+                    if (it.product.id == product.id) it.copy(quantity = it.quantity + quantity)
                     else it
                 }
-            } else _cartItems.value += registerItem
+            } else _cartItems.value += CartItem(product, quantity)
         }
     }
 
-    fun removeFromCart(product: ProductEntity) {
+    fun removeFromCart(product: ProductEntity, quantity: Int) {
         viewModelScope.launch {
-            val cartItem = CartItem(product, 1)
-
             _cartItems.value = _cartItems.value.map {
-                if (it.product.id == cartItem.product.id) it.copy(quantity = it.quantity - 1)
+                if (it.product.id == product.id) it.copy(quantity = it.quantity - quantity)
                 else it
             }.filter { it.quantity > 0 }
         }

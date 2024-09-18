@@ -1,10 +1,13 @@
 package com.yayarh.profits.ui.screens.createOrder
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -15,6 +18,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -45,10 +49,11 @@ import com.yayarh.profits.ui.screens.createOrder.CreateOrderVm.CreateOrderState.
 import com.yayarh.profits.ui.screens.createOrder.CreateOrderVm.CreateOrderState.Idle
 import com.yayarh.profits.ui.screens.createOrder.CreateOrderVm.CreateOrderState.Loading
 import com.yayarh.profits.ui.screens.createOrder.CreateOrderVm.CreateOrderState.OrderSavedSuccessfully
+import com.yayarh.profits.ui.theme.DarkGreen
 import com.yayarh.profits.ui.theme.ProfitsTheme
 import com.yayarh.profits.ui.utils.ShowToast
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Destination<RootGraph>
 @Composable
 fun CreateOrderScreen(vm: CreateOrderVm = hiltViewModel(), navController: DestinationsNavigator) {
@@ -88,7 +93,8 @@ fun CreateOrderScreen(vm: CreateOrderVm = hiltViewModel(), navController: Destin
             Box(
                 Modifier
                     .fillMaxSize()
-                    .padding(paddings)) {
+                    .padding(paddings)
+            ) {
                 if (productsList.isEmpty()) {
                     TextRes(R.string.no_products, Modifier.align(Alignment.Center))
                 }
@@ -99,36 +105,51 @@ fun CreateOrderScreen(vm: CreateOrderVm = hiltViewModel(), navController: Destin
                 ) {
                     items(productsList) { product ->
                         Card(
+                            colors = CardDefaults.cardColors(containerColor = Color.White),
+                            border = CardDefaults.outlinedCardBorder(),
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(96.dp)
                                 .padding(horizontal = 16.dp, vertical = 8.dp),
                             content = {
-                                Row {
+                                Box(Modifier.fillMaxWidth()) {
                                     Column(
                                         modifier = Modifier
                                             .padding(8.dp)
-                                            .fillParentMaxHeight()
-                                            .fillMaxWidth(0.8F),
+                                            .fillParentMaxHeight(),
                                         Arrangement.Center
                                     ) {
                                         Text(text = product.name)
-                                        Text(text = product.sellPrice.toString())
+                                        Text(text = stringResource(R.string.value_dzd, product.sellPrice.toString()))
                                     }
-                                    // TODO: Long click to add many or remove many...
-                                    Column(
-                                        modifier = Modifier
-                                            .align(Alignment.CenterVertically)
-                                            .fillParentMaxWidth(0.2F),
-                                        horizontalAlignment = Alignment.CenterHorizontally
-                                    ) {
-                                        IconButton(
-                                            onClick = { vm.addToCart(product, 1) },
-                                            content = { Icon(painterResource(R.drawable.add), stringResource(R.string.add)) }
+
+                                    Row(Modifier.align(Alignment.CenterEnd)) {
+                                        Icon(
+                                            painter = painterResource(R.drawable.remove),
+                                            contentDescription = stringResource(R.string.delete),
+                                            modifier = Modifier
+                                                .fillMaxHeight()
+                                                .background(Color.Red)
+                                                .combinedClickable(
+                                                    onClick = { vm.removeFromCart(product, 1) },
+                                                    onLongClick = { vm.removeFromCart(product, 99) }
+                                                )
+                                                .padding(horizontal = 8.dp),
+                                            tint = Color.White
+
                                         )
-                                        IconButton(
-                                            onClick = { vm.removeFromCart(product) },
-                                            content = { Icon(painterResource(R.drawable.remove), stringResource(R.string.delete)) }
+                                        Icon(
+                                            painter = painterResource(R.drawable.add),
+                                            contentDescription = stringResource(R.string.add),
+                                            modifier = Modifier
+                                                .fillMaxHeight()
+                                                .background(DarkGreen)
+                                                .combinedClickable(
+                                                    onClick = { vm.addToCart(product, 1) },
+                                                    onLongClick = { vm.addToCart(product, 10) }
+                                                )
+                                                .padding(horizontal = 8.dp),
+                                            tint = Color.White
                                         )
                                     }
                                 }
